@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  mysql-field:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "root123"
+      MYSQL_DATABASE: "field"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-field:/var/lib/mysql
+    networks:
+      - test-demo
+
+  mysql-table:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "root123"
+      MYSQL_DATABASE: "field"
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-table:/var/lib/mysql
+    networks:
+      - test-demo
+
+  adminer:
+    image: adminer
+    ports:
+      - 9095:8080
+    networks:
+      - test-demo
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql-field
+      - mysql-table
+    networks:
+      - test-demo
+    container_name: "api-test"
+
+volumes:
+  mysql-table:
+    external: true
+  mysql-field:
+    external: true
+
+networks:
+  test-demo:
+    driver: bridge
